@@ -76,11 +76,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       return new StellarWalletsKit({
         network: WalletNetwork.TESTNET,
         selectedWalletId: walletId || undefined,
-        modules: [
-          new FreighterModule(),
-          new AlbedoModule(),
-          new xBullModule(),
-        ],
+        modules: [new FreighterModule(), new AlbedoModule(), new xBullModule()],
       });
     } catch {
       return null;

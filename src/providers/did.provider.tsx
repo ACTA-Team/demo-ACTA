@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { getEnvDefaults } from '@/lib/env';
 import { useWalletContext } from '@/providers/wallet.provider';
 
 type DidContextValue = {
@@ -11,18 +10,13 @@ type DidContextValue = {
 
 const DidContext = createContext<DidContextValue | undefined>(undefined);
 
-function detectNetworkTag(rpcUrl: string, networkPassphrase: string): 'testnet' | 'public' {
-  const isTestnet = /testnet/i.test(rpcUrl) || /Test SDF Network/i.test(networkPassphrase);
-  return isTestnet ? 'testnet' : 'public';
-}
-
-export function makeDidForAddress(address: string, networkTag: 'testnet' | 'public'): string {
-  return `did:pkh:stellar:${networkTag}:${address}`;
+export function makeDidForAddress(address: string): string {
+  // Always use testnet for this demo
+  return `did:pkh:stellar:testnet:${address}`;
 }
 
 export function DidProvider({ children }: { children: React.ReactNode }) {
   const { walletAddress } = useWalletContext();
-  const { rpcUrl, networkPassphrase } = getEnvDefaults();
   const [ownerDid, setOwnerDidState] = useState<string | null>(null);
 
   const setOwnerDid = (did: string | null) => {
@@ -38,7 +32,7 @@ export function DidProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Initialize DID from wallet + env or from localStorage
+  // Initialize DID from wallet or from localStorage
   useEffect(() => {
     const stored = typeof window !== 'undefined' ? localStorage.getItem('acta_owner_did') : null;
     if (stored) {
@@ -46,13 +40,12 @@ export function DidProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     if (walletAddress) {
-      const tag = detectNetworkTag(rpcUrl, networkPassphrase);
-      const did = makeDidForAddress(walletAddress, tag);
+      const did = makeDidForAddress(walletAddress);
       setOwnerDidState(did);
     } else {
       setOwnerDidState(null);
     }
-  }, [walletAddress, rpcUrl, networkPassphrase]);
+  }, [walletAddress]);
 
   const value = useMemo<DidContextValue>(() => ({ ownerDid, setOwnerDid }), [ownerDid]);
   return <DidContext.Provider value={value}>{children}</DidContext.Provider>;

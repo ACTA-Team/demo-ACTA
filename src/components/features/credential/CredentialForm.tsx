@@ -12,13 +12,11 @@ import {
 import { useWalletContext } from '@/providers/wallet.provider';
 import { useDidContext } from '@/providers/did.provider';
 import { useCredential } from '@acta-team/acta-sdk';
-import { getEnvDefaults } from '@/lib/env';
 import { toast } from 'sonner';
 
 export function CredentialForm() {
   const { walletAddress, signTransaction } = useWalletContext();
   const { ownerDid } = useDidContext();
-  const { rpcUrl, networkPassphrase } = getEnvDefaults();
   const { issue } = useCredential();
 
   const [issuerName, setIssuerName] = useState('');
@@ -98,11 +96,8 @@ export function CredentialForm() {
         signTransaction: signTransaction,
       });
       setTxId(result.txId);
-      const isTestnet = /testnet/i.test(rpcUrl) || /Test SDF Network/i.test(networkPassphrase);
-      const explorerBase = isTestnet
-        ? 'https://stellar.expert/explorer/testnet'
-        : 'https://stellar.expert/explorer/public';
-      const explorerUrl = `${explorerBase}/tx/${result.txId}`;
+      // Always use testnet explorer for this demo
+      const explorerUrl = `https://stellar.expert/explorer/testnet/tx/${result.txId}`;
       toast.success('Credential created', {
         action: {
           label: 'View on Stellar Expert',
