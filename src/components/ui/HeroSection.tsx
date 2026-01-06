@@ -83,10 +83,10 @@ export default function HeroSection() {
             className=" text-black flex items-center bg-white space-x-2 transition-all duration-300 hover:-translate-y-0.5 "
           >
             <Link
-              href="https://stellar.expert/"
+              href="https://dapp.acta.build"
               className="w-full sm:w-60 rounded-full px-6 py-2 font-medium text-black text-center"
             >
-              View Stellar Expert
+              View dApp
             </Link>
           </HoverBorderGradient>
         </motion.div>
