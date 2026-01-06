@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { useWalletContext } from '@/providers/wallet.provider';
 import { useDidContext } from '@/providers/did.provider';
-import { storeVcSingleCall } from '@/lib/vault/store';
+import { useCredential } from '@acta-team/acta-sdk';
 import { getEnvDefaults } from '@/lib/env';
 import { toast } from 'sonner';
 
@@ -19,6 +19,7 @@ export function CredentialForm() {
   const { walletAddress, signTransaction } = useWalletContext();
   const { ownerDid } = useDidContext();
   const { rpcUrl, networkPassphrase } = getEnvDefaults();
+  const { issue } = useCredential();
 
   const [issuerName, setIssuerName] = useState('');
   const [subjectDid, setSubjectDid] = useState(
@@ -87,21 +88,14 @@ export function CredentialForm() {
       };
 
       const vcData = JSON.stringify(vc);
-      const fields = {
-        issuerName,
-        subjectDid,
-        degreeType,
-        degreeName,
-        validFrom,
-        vcData,
-      } as Record<string, string>;
 
-      const result = await storeVcSingleCall({
+      const result = await issue({
         owner: walletAddress,
         vcId: generatedVcId,
-        didUri: ownerDid,
-        fields,
-        signTransaction: (xdr, opts) => signTransaction(xdr, opts),
+        vcData: vcData,
+        issuer: walletAddress,
+        issuerDid: ownerDid || undefined,
+        signTransaction: signTransaction,
       });
       setTxId(result.txId);
       const isTestnet = /testnet/i.test(rpcUrl) || /Test SDF Network/i.test(networkPassphrase);

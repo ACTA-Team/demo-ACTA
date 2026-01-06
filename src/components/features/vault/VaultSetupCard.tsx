@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/providers/wallet.provider';
 import { useDid } from '@/hooks/did/use-did';
-import { useVault } from '@/hooks/vault/use-vault';
+import { useVault } from '@acta-team/acta-sdk';
 import { toast } from 'sonner';
 import { Copy, Check } from 'lucide-react';
 
 export function VaultSetupCard() {
-  const { walletAddress } = useWalletContext();
+  const { walletAddress, signTransaction } = useWalletContext();
   const { ownerDid, saveComputedDid } = useDid();
-  const { loading, createVault } = useVault();
+  const { createVault } = useVault();
+  const [loading, setLoading] = useState(false);
   const [txInit, setTxInit] = useState<string | null>(null);
   const [copiedWallet, setCopiedWallet] = useState(false);
   const [copiedDID, setCopiedDID] = useState(false);
@@ -23,17 +24,24 @@ export function VaultSetupCard() {
   };
 
   const doCreateVault = async () => {
-    if (!ownerDid) {
+    if (!ownerDid || !walletAddress || !signTransaction) {
       return;
     }
+    setLoading(true);
     try {
-      const res = await createVault(ownerDid);
+      const res = await createVault({
+        owner: walletAddress,
+        ownerDid: ownerDid,
+        signTransaction: signTransaction,
+      });
       setTxInit(res.txId);
       toast.success('Vault created');
     } catch (e: unknown) {
       toast.error('Could not create vault', {
         description: friendlyError(e, 'Something went wrong. Please try again.'),
       });
+    } finally {
+      setLoading(false);
     }
   };
 

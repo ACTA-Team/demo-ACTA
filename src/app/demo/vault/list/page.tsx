@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/providers/wallet.provider';
-import { listVcIdsDirect } from '@/lib/vault/list';
+import { useVaultRead } from '@acta-team/acta-sdk';
 import { Hero } from '@/layouts/Hero';
 import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
 import { GlowingCard } from '@/components/ui/glowing-card';
@@ -12,6 +12,7 @@ import { AnimatedSection } from '@/components/ui/animated-section';
 
 export default function VaultListPage() {
   const { walletAddress } = useWalletContext();
+  const { listVcIds } = useVaultRead();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ids, setIds] = useState<string[]>([]);
@@ -22,7 +23,7 @@ export default function VaultListPage() {
     setError(null);
     setIds([]);
     try {
-      const res = await listVcIdsDirect({ owner: walletAddress });
+      const res = await listVcIds({ owner: walletAddress });
       setIds(res);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);

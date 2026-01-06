@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/providers/wallet.provider';
-import { useVault } from '@/hooks/vault/use-vault';
+import { useVault } from '@acta-team/acta-sdk';
 import { toast } from 'sonner';
 
 export function AuthorizedIssuersCard() {
-  const { walletAddress } = useWalletContext();
-  const { loading, authorizeSelf } = useVault();
+  const { walletAddress, signTransaction } = useWalletContext();
+  const { authorizeIssuer } = useVault();
+  const [loading, setLoading] = useState(false);
   const [txAuth, setTxAuth] = useState<string | null>(null);
 
   const friendlyError = (e: unknown, fallback: string) => {
@@ -18,14 +19,25 @@ export function AuthorizedIssuersCard() {
   };
 
   const doAuthorize = async () => {
+    if (!walletAddress || !signTransaction) {
+      toast.error('Connect your wallet first');
+      return;
+    }
+    setLoading(true);
     try {
-      const res = await authorizeSelf();
+      const res = await authorizeIssuer({
+        owner: walletAddress,
+        issuer: walletAddress,
+        signTransaction: signTransaction,
+      });
       setTxAuth(res.txId);
       toast.success('Wallet authorized');
     } catch (e: unknown) {
       toast.error('Could not authorize wallet', {
         description: friendlyError(e, 'Something went wrong. Please try again.'),
       });
+    } finally {
+      setLoading(false);
     }
   };
 

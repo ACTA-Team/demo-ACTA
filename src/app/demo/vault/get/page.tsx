@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/providers/wallet.provider';
-import { getVcDirect } from '@/lib/vault/get';
+import { useVaultRead } from '@acta-team/acta-sdk';
 import { VcCard } from '@/components/features/vault/VcCard';
 import { Hero } from '@/layouts/Hero';
 import { GlowingCard } from '@/components/ui/glowing-card';
@@ -11,6 +11,7 @@ import { AnimatedSection } from '@/components/ui/animated-section';
 
 export default function VaultGetPage() {
   const { walletAddress } = useWalletContext();
+  const { getVc } = useVaultRead();
   const [vcId, setVcId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +27,7 @@ export default function VaultGetPage() {
     setError(null);
     setVc(null);
     try {
-      const res = await getVcDirect({ owner: walletAddress, vcId });
+      const res = await getVc({ owner: walletAddress, vcId });
       if (res && typeof res === 'object' && !Array.isArray(res)) {
         setVc(res as Record<string, unknown>);
       } else {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from 'react';
 import {
   StellarWalletsKit,
   WalletNetwork,
@@ -45,83 +45,47 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [walletName, setWalletName] = useState<string | null>(null);
   const [walletId, setWalletId] = useState<string | null>(null);
   const [authMethod, setAuthMethod] = useState<'wallet' | null>(null);
-  const [walletKit, setWalletKit] = useState<StellarWalletsKit | null>(null);
 
+  const clearWalletInfo = React.useCallback(() => {
+    setWalletAddress(null);
+    setWalletName(null);
+    setWalletId(null);
+    setAuthMethod(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('walletAddress');
+      localStorage.removeItem('walletName');
+      localStorage.removeItem('walletId');
+    }
+  }, []);
+
+  // Load from localStorage only on client after mount
   useEffect(() => {
-    // Restore session
-    const storedAddress =
-      typeof window !== 'undefined' ? localStorage.getItem('walletAddress') : null;
-    const storedName = typeof window !== 'undefined' ? localStorage.getItem('walletName') : null;
-    const storedId = typeof window !== 'undefined' ? localStorage.getItem('walletId') : null;
+    const storedAddress = localStorage.getItem('walletAddress');
+    const storedName = localStorage.getItem('walletName');
+    const storedId = localStorage.getItem('walletId');
     if (storedAddress) setWalletAddress(storedAddress);
     if (storedName) setWalletName(storedName);
     if (storedId) setWalletId(storedId);
     if (storedAddress) setAuthMethod('wallet');
-
-    if (typeof window !== 'undefined') {
-      (async () => {
-        // Always initialize kit with browser wallets; add WalletConnect only if configured
-        try {
-          let projectId: string | undefined = undefined;
-          try {
-            const res = await fetch('/api/walletconnect');
-            if (res.ok) {
-              const data = await res.json();
-              projectId = (data?.projectId as string | undefined) || undefined;
-            }
-          } catch {}
-
-          const origin = window.location.origin;
-          const modules = [new FreighterModule(), new AlbedoModule(), new xBullModule()];
-          if (projectId) {
-            modules.splice(
-              2,
-              0, // keep xBull last for consistency
-              new WalletConnectModule({
-                url: origin,
-                projectId,
-                method: WalletConnectAllowedMethods.SIGN,
-                description: 'ACTA Credential DApp',
-                name: 'ACTA',
-                icons: [`${origin}/white.png`],
-                network: WalletNetwork.TESTNET,
-              })
-            );
-          }
-
-          const kit = new StellarWalletsKit({
-            network: WalletNetwork.TESTNET,
-            modules,
-          });
-          setWalletKit(kit);
-
-          // If we have a stored wallet id, restore the selected module
-          if (storedId) {
-            try {
-              kit.setWallet(storedId);
-            } catch (e) {}
-          } else if (storedName) {
-            const inferredId = mapWalletNameToId(storedName);
-            if (inferredId) {
-              try {
-                kit.setWallet(inferredId);
-                setWalletId(inferredId);
-              } catch (e) {}
-            }
-          }
-        } catch (err) {
-          // As a last resort, ensure at least browser wallets are available
-          try {
-            const kit = new StellarWalletsKit({
-              network: WalletNetwork.TESTNET,
-              modules: [new FreighterModule(), new AlbedoModule(), new xBullModule()],
-            });
-            setWalletKit(kit);
-          } catch {}
-        }
-      })();
-    }
   }, []);
+
+  // Always use TESTNET - no network switching
+  const walletKit = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return new StellarWalletsKit({
+        network: WalletNetwork.TESTNET,
+        selectedWalletId: walletId || undefined,
+        modules: [
+          new FreighterModule(),
+          new AlbedoModule(),
+          new xBullModule(),
+        ],
+      });
+    } catch {
+      return null;
+    }
+  }, [walletId]);
 
   const setWalletInfo = async (address: string, name: string, id: string) => {
     setWalletAddress(address);
@@ -135,33 +99,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const clearWalletInfo = () => {
-    setWalletAddress(null);
-    setWalletName(null);
-    setWalletId(null);
-    setAuthMethod(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('walletAddress');
-      localStorage.removeItem('walletName');
-      localStorage.removeItem('walletId');
-    }
-  };
-
   const signTransaction = async (xdr: string, options: { networkPassphrase: string }) => {
-    if (!walletKit) throw new Error('Wallet kit not initialized');
-    // Ensure wallet module is set; attempt restore from state/localStorage
-    try {
-      const id =
-        walletId || (typeof window !== 'undefined' ? localStorage.getItem('walletId') : null);
-      if (id) {
-        walletKit.setWallet(id);
-      } else {
-        const inferredId = mapWalletNameToId(walletName);
-        if (inferredId) {
-          walletKit.setWallet(inferredId);
-        }
-      }
-    } catch (e) {}
+    if (!walletKit) throw new Error('WalletKit unavailable');
     const { signedTxXdr } = await walletKit.signTransaction(xdr, {
       address: walletAddress || undefined,
       networkPassphrase: options.networkPassphrase,
@@ -178,7 +117,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         authMethod,
         setWalletInfo,
         clearWalletInfo,
-        signTransaction: walletAddress ? signTransaction : null,
+        signTransaction: walletAddress && walletKit ? signTransaction : null,
         walletKit,
       }}
     >
