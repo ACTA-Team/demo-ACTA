@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { CredentialForm } from '@/components/features/credential/CredentialForm';
+import { CredentialForm } from '@/components/modules/credential/ui/CredentialForm';
 import { Hero } from '@/layouts/Hero';
 import { Button } from '@/components/ui/button';
 import { GlowingCard } from '@/components/ui/glowing-card';

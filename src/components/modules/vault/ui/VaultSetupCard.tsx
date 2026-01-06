@@ -1,70 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useWalletContext } from '@/providers/wallet.provider';
-import { useDid } from '@/hooks/did/use-did';
-import { useVault } from '@acta-team/acta-sdk';
-import { toast } from 'sonner';
+import { useVaultSetup } from '../hooks/use-vault-setup';
 import { Copy, Check } from 'lucide-react';
 
 export function VaultSetupCard() {
-  const { walletAddress, signTransaction } = useWalletContext();
-  const { ownerDid, saveComputedDid } = useDid();
-  const { createVault } = useVault();
-  const [loading, setLoading] = useState(false);
-  const [txInit, setTxInit] = useState<string | null>(null);
-  const [copiedWallet, setCopiedWallet] = useState(false);
-  const [copiedDID, setCopiedDID] = useState(false);
-
-  const friendlyError = (e: unknown, fallback: string) => {
-    const raw = e instanceof Error ? e.message : typeof e === 'string' ? e : '';
-    const msg = raw.trim() || fallback;
-    return msg.length > 160 ? msg.slice(0, 157) + '…' : msg;
-  };
-
-  const doCreateVault = async () => {
-    if (!ownerDid || !walletAddress || !signTransaction) {
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await createVault({
-        owner: walletAddress,
-        ownerDid: ownerDid,
-        signTransaction: signTransaction,
-      });
-      setTxInit(res.txId);
-      toast.success('Vault created');
-    } catch (e: unknown) {
-      toast.error('Could not create vault', {
-        description: friendlyError(e, 'Something went wrong. Please try again.'),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Auto-compute and save DID on mount to reduce friction
-  useEffect(() => {
-    if (!ownerDid && walletAddress) {
-      try {
-        saveComputedDid();
-      } catch {}
-    }
-  }, [ownerDid, walletAddress, saveComputedDid]);
-
-  const copyToClipboard = (text: string, type: 'wallet' | 'did') => {
-    navigator.clipboard.writeText(text);
-
-    if (type === 'wallet') {
-      setCopiedWallet(true);
-      setTimeout(() => setCopiedWallet(false), 2000);
-    } else {
-      setCopiedDID(true);
-      setTimeout(() => setCopiedDID(false), 2000);
-    }
-  };
+  const { walletAddress, ownerDid, state, doCreateVault, copyToClipboard } = useVaultSetup();
 
   return (
     <div className="space-y-6">
@@ -84,7 +25,7 @@ export function VaultSetupCard() {
                   className="shrink-0 h-8 w-8 p-0 hover:bg-white/10"
                   onClick={() => copyToClipboard(walletAddress, 'wallet')}
                 >
-                  {copiedWallet ? (
+                  {state.copiedWallet ? (
                     <Check className="h-4 w-4 text-green-400" />
                   ) : (
                     <Copy className="h-4 w-4 text-gray-400" />
@@ -108,7 +49,7 @@ export function VaultSetupCard() {
                   className="shrink-0 h-8 w-8 p-0 hover:bg-white/10"
                   onClick={() => copyToClipboard(ownerDid, 'did')}
                 >
-                  {copiedDID ? (
+                  {state.copiedDID ? (
                     <Check className="h-4 w-4 text-green-400" />
                   ) : (
                     <Copy className="h-4 w-4 text-gray-400" />
@@ -124,12 +65,10 @@ export function VaultSetupCard() {
         size="lg"
         className="bg-white text-black hover:bg-gray-200 font-medium w-full"
         onClick={doCreateVault}
-        disabled={!walletAddress || loading}
+        disabled={!walletAddress || state.loading}
       >
         Create Vault
       </Button>
-
-      {/* Transaction details hidden per requirement */}
     </div>
   );
 }

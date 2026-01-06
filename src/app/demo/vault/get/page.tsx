@@ -3,41 +3,27 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/providers/wallet.provider';
-import { useVaultRead } from '@acta-team/acta-sdk';
-import { VcCard } from '@/components/features/vault/VcCard';
+import { useVaultRead } from '@/components/modules/vault/hooks/use-vault-read';
+import { VcCard } from '@/components/modules/vault/ui/VcCard';
 import { Hero } from '@/layouts/Hero';
 import { GlowingCard } from '@/components/ui/glowing-card';
 import { AnimatedSection } from '@/components/ui/animated-section';
+import type { VaultRecord } from '@/@types/vault';
 
 export default function VaultGetPage() {
   const { walletAddress } = useWalletContext();
-  const { getVc } = useVaultRead();
+  const { loading, error, handleGet } = useVaultRead();
   const [vcId, setVcId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [vc, setVc] = useState<Record<string, unknown> | null>(null);
+  const [vc, setVc] = useState<VaultRecord | null>(null);
 
-  const handleGet = async () => {
+  const onGet = async () => {
     if (!walletAddress) return;
     if (!vcId) {
-      setError('VC ID required');
       return;
     }
-    setLoading(true);
-    setError(null);
-    setVc(null);
-    try {
-      const res = await getVc({ owner: walletAddress, vcId });
-      if (res && typeof res === 'object' && !Array.isArray(res)) {
-        setVc(res as Record<string, unknown>);
-      } else {
-        setError('Unexpected response');
-      }
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e);
-      setError(message);
-    } finally {
-      setLoading(false);
+    const result = await handleGet(vcId);
+    if (result) {
+      setVc(result);
     }
   };
 
@@ -61,7 +47,7 @@ export default function VaultGetPage() {
                   value={vcId}
                   onChange={(e) => setVcId(e.target.value)}
                 />
-                <Button onClick={handleGet} disabled={loading} variant="outline">
+                <Button onClick={onGet} disabled={loading} variant="outline">
                   {loading ? 'Fetching…' : 'Get VC'}
                 </Button>
               </div>

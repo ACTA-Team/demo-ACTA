@@ -7,8 +7,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
-
-type VcRecord = Record<string, unknown>;
+import type { VaultRecord } from '@/@types/vault';
 
 function safeParseJson<T = unknown>(str?: string | null): T | null {
   if (!str || typeof str !== 'string') return null;
@@ -24,7 +23,7 @@ function safeParseJson<T = unknown>(str?: string | null): T | null {
   }
 }
 
-function buildSummary(record: VcRecord) {
+function buildSummary(record: VaultRecord) {
   const dataStr = typeof record.data === 'string' ? record.data : undefined;
   const meta = safeParseJson<Record<string, unknown>>(dataStr);
   const vcDataStr = typeof meta?.vcData === 'string' ? (meta?.vcData as string) : undefined;
@@ -68,7 +67,7 @@ function buildSummary(record: VcRecord) {
   return { issuerName, subjectDid, degreeType, degreeName, validFrom, meta, vcInner };
 }
 
-export function VcCard({ record, className }: { record: VcRecord; className?: string }) {
+export function VcCard({ record, className }: { record: VaultRecord; className?: string }) {
   const { issuerName, subjectDid, degreeType, degreeName, validFrom, meta, vcInner } =
     buildSummary(record);
   const id = typeof record.id === 'string' ? record.id : '—';

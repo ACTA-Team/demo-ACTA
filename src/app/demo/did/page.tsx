@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/providers/wallet.provider';
-import { DidCard } from '@/components/features/did/DidCard';
+import { DidCard } from '@/components/modules/did/ui/DidCard';
 import { Hero } from '@/layouts/Hero';
 import { GlowingCard } from '@/components/ui/glowing-card';
 

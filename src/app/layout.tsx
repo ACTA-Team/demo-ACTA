@@ -5,7 +5,7 @@ import { WalletProvider } from '@/providers/wallet.provider';
 import { NetworkProvider } from '@/providers/network.provider';
 import { DidProvider } from '@/providers/did.provider';
 import { AppThemeProvider } from '@/providers/theme.provider';
-import { ActaConfigServer } from '@/components/ActaConfigServer';
+import { ActaConfigServer } from '@/components/config/ActaConfigServer';
 import { SiteHeader } from '@/layouts/Header';
 import { Toaster } from '@/components/ui/sonner';
 

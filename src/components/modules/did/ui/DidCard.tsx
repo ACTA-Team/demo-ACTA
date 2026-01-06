@@ -1,20 +1,10 @@
 'use client';
 
-import { useWalletContext } from '@/providers/wallet.provider';
-import { useDid } from '@/hooks/did/use-did';
 import { Button } from '@/components/ui/button';
+import { useDidCard } from '../hooks/use-did-card';
 
 export function DidCard() {
-  const { walletAddress } = useWalletContext();
-  const { ownerDid, computeDid, saveComputedDid } = useDid();
-
-  const onSave = () => {
-    const did = computeDid();
-    if (!did) {
-      return;
-    }
-    saveComputedDid();
-  };
+  const { walletAddress, ownerDid, onSave } = useDidCard();
 
   return (
     <div className="rounded border p-6 md:p-8 space-y-3">

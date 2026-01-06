@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { VaultSetupCard } from '@/components/features/vault/VaultSetupCard';
+import { VaultSetupCard } from '@/components/modules/vault/ui/VaultSetupCard';
 import { Button } from '@/components/ui/button';
 import { Hero } from '@/layouts/Hero';
 import { GlowingCard } from '@/components/ui/glowing-card';

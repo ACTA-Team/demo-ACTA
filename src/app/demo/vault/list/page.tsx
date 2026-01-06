@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/providers/wallet.provider';
-import { useVaultRead } from '@acta-team/acta-sdk';
+import { useVaultRead } from '@/components/modules/vault/hooks/use-vault-read';
 import { Hero } from '@/layouts/Hero';
 import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
 import { GlowingCard } from '@/components/ui/glowing-card';
@@ -12,25 +12,13 @@ import { AnimatedSection } from '@/components/ui/animated-section';
 
 export default function VaultListPage() {
   const { walletAddress } = useWalletContext();
-  const { listVcIds } = useVaultRead();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { loading, error, handleList } = useVaultRead();
   const [ids, setIds] = useState<string[]>([]);
 
-  const handleList = async () => {
+  const onList = async () => {
     if (!walletAddress) return;
-    setLoading(true);
-    setError(null);
-    setIds([]);
-    try {
-      const res = await listVcIds({ owner: walletAddress });
-      setIds(res);
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e);
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
+    const result = await handleList();
+    setIds(result);
   };
 
   const copyId = async (text: string) => {
@@ -56,7 +44,13 @@ export default function VaultListPage() {
                   <h3 className="text-lg font-medium">Vault Records</h3>
                   <p className="text-xs text-muted-foreground">IDs of stored credentials</p>
                 </div>
-                <Button onClick={handleList} variant="outline" size="sm" className="shrink-0">
+                <Button
+                  onClick={onList}
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  disabled={loading}
+                >
                   {loading ? 'Listing…' : 'List IDs'}
                 </Button>
               </div>
