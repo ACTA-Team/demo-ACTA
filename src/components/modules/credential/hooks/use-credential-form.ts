@@ -85,6 +85,7 @@ export function useCredentialForm() {
         vcId: generatedVcId,
         vcData: vcData,
         issuer: walletAddress,
+        holder: state.subjectDid,
         issuerDid: ownerDid || undefined,
         signTransaction: signTransaction,
       });
