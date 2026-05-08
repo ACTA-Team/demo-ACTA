@@ -1,6 +1,6 @@
 'use client';
 
-import { ActaConfig, testNet } from '@acta-team/acta-sdk';
+import { ActaConfig, testNet } from '@acta-team/credentials';
 import { ReactNode } from 'react';
 
 interface ActaConfigProviderProps {

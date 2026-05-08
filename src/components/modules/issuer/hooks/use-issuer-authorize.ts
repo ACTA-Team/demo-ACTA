@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useWalletContext } from '@/providers/wallet.provider';
-import { useVault } from '@acta-team/acta-sdk';
+import { useVault } from '@acta-team/credentials';
 import { toast } from 'sonner';
 import type { IssuerAuthorizeState } from '@/@types/issuer';
 

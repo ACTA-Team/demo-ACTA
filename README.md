@@ -6,7 +6,7 @@ This demo showcases how to integrate the ACTA SDK with a Next.js application usi
 
 - Wallet-gated UI with simple flows: Vault, Authorized Issuers, DID, and Credential creation.
 - Client-signed transactions using `@creit.tech/stellar-wallets-kit`.
-- Integration with `@acta-team/acta-sdk` React hooks for all ACTA operations.
+- Integration with `@acta-team/credentials` React hooks for all ACTA operations.
 - Testnet-only configuration (no mainnet support).
 
 ## Prerequisites
@@ -52,12 +52,12 @@ Open `http://localhost:3000`.
 
 ## SDK Integration
 
-The demo uses the `@acta-team/acta-sdk` React hooks for all ACTA operations:
+The demo uses the `@acta-team/credentials` React hooks for all ACTA operations:
 
 ### Vault Operations
 
 ```ts
-import { useVault } from '@acta-team/acta-sdk';
+import { useVault } from '@acta-team/credentials';
 
 const { createVault, authorizeIssuer, revokeIssuer } = useVault();
 
@@ -79,7 +79,7 @@ await authorizeIssuer({
 ### Credential Operations
 
 ```ts
-import { useCredential } from '@acta-team/acta-sdk';
+import { useCredential } from '@acta-team/credentials';
 
 const { issue, revoke } = useCredential();
 
@@ -97,7 +97,7 @@ const { txId } = await issue({
 ### Read Operations
 
 ```ts
-import { useVaultRead } from '@acta-team/acta-sdk';
+import { useVaultRead } from '@acta-team/credentials';
 
 const { listVcIds, getVc, verifyVc } = useVaultRead();
 

@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useWalletContext } from '@/providers/wallet.provider';
 import { useDidContext } from '@/providers/did.provider';
-import { useCredential } from '@acta-team/acta-sdk';
+import { useCredential } from '@acta-team/credentials';
 import { toast } from 'sonner';
 import type { CredentialFormState, VerifiableCredential } from '@/@types/credentials';
 

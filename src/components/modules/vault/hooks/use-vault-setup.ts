@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useWalletContext } from '@/providers/wallet.provider';
 import { useDid } from '@/hooks/did/use-did';
-import { useVault } from '@acta-team/acta-sdk';
+import { useVault } from '@acta-team/credentials';
 import { toast } from 'sonner';
 import type { VaultSetupState } from '@/@types/vault';
 

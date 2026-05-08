@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useWalletContext } from '@/providers/wallet.provider';
-import { useVaultRead as useSdkVaultRead } from '@acta-team/acta-sdk';
+import { useVaultRead as useSdkVaultRead } from '@acta-team/credentials';
 import type { VaultRecord } from '@/@types/vault';
 
 export function useVaultRead() {
