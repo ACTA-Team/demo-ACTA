@@ -1,17 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from 'react';
-import {
-  StellarWalletsKit,
-  WalletNetwork,
-  FreighterModule,
-  AlbedoModule,
-  xBullModule,
-} from '@creit.tech/stellar-wallets-kit';
-import {
-  WalletConnectModule,
-  WalletConnectAllowedMethods,
-} from '@creit.tech/stellar-wallets-kit/modules/walletconnect.module';
+import React, { createContext, useContext, useEffect, useState, useMemo, ReactNode } from 'react';
+import type { StellarWalletsKit } from '@creit.tech/stellar-wallets-kit';
 
 type WalletContextType = {
   walletAddress: string | null;
@@ -73,6 +63,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const walletKit = useMemo(() => {
     if (typeof window === 'undefined') return null;
     try {
+      // Load the wallet runtime only on the client and when needed.
+      // This avoids module resolution issues during Vitest runs.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+      const {
+        StellarWalletsKit,
+        WalletNetwork,
+        FreighterModule,
+        AlbedoModule,
+        xBullModule,
+      } = require('@creit.tech/stellar-wallets-kit');
+
       return new StellarWalletsKit({
         network: WalletNetwork.TESTNET,
         selectedWalletId: walletId || undefined,

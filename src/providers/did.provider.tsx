@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useWalletContext } from '@/providers/wallet.provider';
+import { isStellarAddress } from '@/lib/validation';
 
 type DidContextValue = {
   ownerDid: string | null;
@@ -11,6 +12,10 @@ type DidContextValue = {
 const DidContext = createContext<DidContextValue | undefined>(undefined);
 
 export function makeDidForAddress(address: string): string {
+  if (!isStellarAddress(address)) {
+    throw new Error('Invalid Stellar address');
+  }
+
   // Always use testnet for this demo
   return `did:pkh:stellar:testnet:${address}`;
 }
@@ -40,8 +45,12 @@ export function DidProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     if (walletAddress) {
-      const did = makeDidForAddress(walletAddress);
-      setOwnerDidState(did);
+      try {
+        const did = makeDidForAddress(walletAddress);
+        setOwnerDidState(did);
+      } catch {
+        setOwnerDidState(null);
+      }
     } else {
       setOwnerDidState(null);
     }
