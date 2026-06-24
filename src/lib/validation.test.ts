@@ -5,7 +5,8 @@ const validStellarAddress = 'GAGPI5M5M4CZHQPZSTXOWX4J6UQMUJWFKACPXDRQMZTK43GPOSP
 const invalidStellarAddress = 'G123';
 
 const validDid = `did:pkh:stellar:testnet:${validStellarAddress}`;
-const invalidDid = 'did:pkh:stellar:mainnet:GAGPI5M5M4CZHQPZSTXOWX4J6UQMUJWFKACPXDRQMZTK43GPOSPW6NVU';
+const invalidDid =
+  'did:pkh:stellar:mainnet:GAGPI5M5M4CZHQPZSTXOWX4J6UQMUJWFKACPXDRQMZTK43GPOSPW6NVU';
 
 describe('validation utilities', () => {
   it('validates Stellar public key addresses', () => {

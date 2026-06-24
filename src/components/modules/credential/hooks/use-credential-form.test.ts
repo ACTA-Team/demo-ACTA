@@ -10,7 +10,8 @@ const issueMock = vi.fn(async () => ({ txId: 'mockTxId' }));
 const signTransactionMock = vi.fn(async () => 'signedTx');
 
 vi.mock('@acta-team/acta-sdk', async () => {
-  const actual = await vi.importActual<typeof import('@/test-stubs/acta-sdk')>('@/test-stubs/acta-sdk');
+  const actual =
+    await vi.importActual<typeof import('@/test-stubs/acta-sdk')>('@/test-stubs/acta-sdk');
   return {
     ...actual,
     useCredential: () => ({
