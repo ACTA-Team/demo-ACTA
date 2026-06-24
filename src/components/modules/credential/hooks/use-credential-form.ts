@@ -5,6 +5,7 @@ import { useWalletContext } from '@/providers/wallet.provider';
 import { useDidContext } from '@/providers/did.provider';
 import { useCredential } from '@acta-team/credentials';
 import { toast } from 'sonner';
+import { isStellarTestnetDid } from '@/lib/validation';
 import type { CredentialFormState, VerifiableCredential } from '@/@types/credentials';
 
 export function useCredentialForm() {
@@ -13,7 +14,7 @@ export function useCredentialForm() {
   const { issue } = useCredential();
   const [state, setState] = useState<CredentialFormState>({
     issuerName: '',
-    subjectDid: 'did:pkh:stellar:testnet:GAGPI5M5M4CZHQPZSTXOWX4J6UQMUJWFKACPXDRQMZTK43GPOSPW6NVU',
+    subjectDid: '',
     degreeType: '',
     degreeName: '',
     validFrom: new Date().toISOString(),
@@ -44,6 +45,10 @@ export function useCredentialForm() {
     }
     if (!state.issuerName || !state.subjectDid || !state.degreeType || !state.degreeName) {
       toast.error('Please fill all required fields');
+      return;
+    }
+    if (!isStellarTestnetDid(state.subjectDid)) {
+      toast.error('Invalid Subject DID format');
       return;
     }
     if (!signTransaction) {
