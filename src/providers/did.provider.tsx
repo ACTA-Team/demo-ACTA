@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useWalletContext } from '@/providers/wallet.provider';
+import { isStellarAddress } from '@/lib/validation';
 
 type DidContextValue = {
   ownerDid: string | null;
@@ -10,7 +11,8 @@ type DidContextValue = {
 
 const DidContext = createContext<DidContextValue | undefined>(undefined);
 
-export function makeDidForAddress(address: string): string {
+export function makeDidForAddress(address: string): string | null {
+  if (!isStellarAddress(address)) return null;
   // Always use testnet for this demo
   return `did:pkh:stellar:testnet:${address}`;
 }
