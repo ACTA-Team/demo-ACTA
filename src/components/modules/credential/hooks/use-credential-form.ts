@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useWalletContext } from '@/providers/wallet.provider';
 import { useDidContext } from '@/providers/did.provider';
+import { isDidPkhStellarTestnet } from '@/lib/validation';
 import { useCredential } from '@acta-team/acta-sdk';
 import { toast } from 'sonner';
 import type { CredentialFormState, VerifiableCredential } from '@/@types/credentials';
@@ -44,6 +45,10 @@ export function useCredentialForm() {
     }
     if (!state.issuerName || !state.subjectDid || !state.degreeType || !state.degreeName) {
       toast.error('Please fill all required fields');
+      return;
+    }
+    if (!isDidPkhStellarTestnet(state.subjectDid)) {
+      toast.error('Invalid subject DID');
       return;
     }
     if (!signTransaction) {
