@@ -47,9 +47,28 @@ export function SiteHeader() {
           />
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-end">
+          <div className="hidden sm:flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm" className="text-sm font-medium">
+              <a href="https://docs.acta.build/" target="_blank" rel="noopener noreferrer">
+                Docs
+              </a>
+            </Button>
+
+            <Button asChild variant="ghost" size="sm" className="text-sm font-medium">
+              <a href="https://links.acta.build/" target="_blank" rel="noopener noreferrer">
+                Links
+              </a>
+            </Button>
+
+            <Button asChild variant="ghost" size="sm" className="text-sm font-medium">
+              <a href="https://dapp.acta.build/" target="_blank" rel="noopener noreferrer">
+                Website
+              </a>
+            </Button>
+          </div>
           {walletAddress ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-4">
               <Button
                 className="!bg-white text-black hover:bg-foreground hover:text-background"
                 variant="outline"
@@ -60,14 +79,16 @@ export function SiteHeader() {
               </Button>
             </div>
           ) : (
-            <Button
-              className="!bg-white text-black hover:bg-foreground hover:text-background"
-              variant="outline"
-              size="sm"
-              onClick={handleConnect}
-            >
-              Connect Wallet
-            </Button>
+            <div className="ml-4">
+              <Button
+                className="!bg-white text-black hover:bg-foreground hover:text-background"
+                variant="outline"
+                size="sm"
+                onClick={handleConnect}
+              >
+                Connect Wallet
+              </Button>
+            </div>
           )}
         </div>
       </div>
