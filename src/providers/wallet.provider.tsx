@@ -65,13 +65,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     try {
       // Load the wallet runtime only on the client and when needed.
       // This avoids module resolution issues during Vitest runs.
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
       const {
         StellarWalletsKit,
         WalletNetwork,
         FreighterModule,
         AlbedoModule,
         xBullModule,
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
       } = require('@creit.tech/stellar-wallets-kit');
 
       return new StellarWalletsKit({
