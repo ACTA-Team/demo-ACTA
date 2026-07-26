@@ -5,24 +5,27 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useWalletContext } from '@/providers/wallet.provider';
 import { useWalletKit } from '@/hooks/stellar/use-wallet-kit';
+import { toast } from 'sonner';
 
 export function SiteHeader() {
-  const { walletAddress, clearWalletInfo } = useWalletContext();
+  const { walletAddress } = useWalletContext();
   const { connectWithWalletKit, disconnectWalletKit } = useWalletKit();
 
   const handleConnect = async () => {
     try {
       await connectWithWalletKit();
-    } catch {
-      // Swallow errors silently to avoid extra alerts
+    } catch (e) {
+      console.warn('Could not connect wallet', e);
+      toast.error('Could not connect wallet');
     }
   };
 
   const handleDisconnect = async () => {
     try {
       await disconnectWalletKit();
-    } catch {}
-    clearWalletInfo();
+    } catch (e) {
+      console.warn('Could not disconnect wallet', e);
+    }
   };
 
   return (

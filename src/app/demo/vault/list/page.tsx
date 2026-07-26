@@ -9,6 +9,7 @@ import { Hero } from '@/layouts/Hero';
 import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
 import { GlowingCard } from '@/components/ui/glowing-card';
 import { AnimatedSection } from '@/components/ui/animated-section';
+import { toast } from 'sonner';
 
 export default function VaultListPage() {
   const { walletAddress } = useWalletContext();
@@ -24,7 +25,11 @@ export default function VaultListPage() {
   const copyId = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-    } catch {}
+      toast.success('Copied to clipboard');
+    } catch (e) {
+      console.warn('Clipboard copy failed', e);
+      toast.error('Could not copy');
+    }
   };
 
   return (
