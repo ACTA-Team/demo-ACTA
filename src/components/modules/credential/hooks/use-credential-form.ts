@@ -14,7 +14,7 @@ export function useCredentialForm() {
   const { issue } = useCredential();
   const [state, setState] = useState<CredentialFormState>({
     issuerName: '',
-    subjectDid: 'did:pkh:stellar:testnet:GAGPI5M5M4CZHQPZSTXOWX4J6UQMUJWFKACPXDRQMZTK43GPOSPW6NVU',
+    subjectDid: '',
     degreeType: '',
     degreeName: '',
     validFrom: new Date().toISOString(),

@@ -45,11 +45,30 @@ describe('useCredentialForm', () => {
     expect(issueMock).not.toHaveBeenCalled();
   });
 
+  it('rejects a malformed subject DID', async () => {
+    const { result } = renderHook(() => useCredentialForm());
+
+    await act(async () => {
+      result.current.updateField('issuerName', 'Example University');
+      result.current.updateField('subjectDid', 'did:pkh:stellar:testnet:invalid');
+      result.current.updateField('degreeType', 'ExampleBachelorDegree');
+      result.current.updateField('degreeName', 'Bachelor of Science and Arts');
+    });
+
+    await act(async () => {
+      await result.current.handleCreate();
+    });
+
+    expect(result.current.state.txId).toBeNull();
+    expect(issueMock).not.toHaveBeenCalled();
+  });
+
   it('issues a credential when the form is valid', async () => {
     const { result } = renderHook(() => useCredentialForm());
 
     await act(async () => {
       result.current.updateField('issuerName', 'Example University');
+      result.current.updateField('subjectDid', validSubjectDid);
       result.current.updateField('degreeType', 'ExampleBachelorDegree');
       result.current.updateField('degreeName', 'Bachelor of Science and Arts');
     });
