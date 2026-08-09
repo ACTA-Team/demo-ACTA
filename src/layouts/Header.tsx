@@ -8,7 +8,7 @@ import { useWalletKit } from '@/hooks/stellar/use-wallet-kit';
 import { toast } from 'sonner';
 
 export function SiteHeader() {
-  const { walletAddress } = useWalletContext();
+  const { walletAddress, clearWalletInfo } = useWalletContext();
   const { connectWithWalletKit, disconnectWalletKit } = useWalletKit();
 
   const handleConnect = async () => {
@@ -26,6 +26,9 @@ export function SiteHeader() {
     } catch (e) {
       console.warn('Could not disconnect wallet', e);
     }
+    // Always clear local wallet state, even if the kit failed to disconnect,
+    // so the UI never stays stuck on "connected".
+    clearWalletInfo();
   };
 
   return (
