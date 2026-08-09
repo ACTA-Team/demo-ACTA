@@ -50,18 +50,25 @@ export function useVaultSetup() {
     if (!ownerDid && walletAddress) {
       try {
         saveComputedDid();
-      } catch {}
+      } catch (e) {
+        console.warn('Failed to compute DID', e);
+      }
     }
   }, [ownerDid, walletAddress, saveComputedDid]);
 
-  const copyToClipboard = useCallback((text: string, type: 'wallet' | 'did') => {
-    navigator.clipboard.writeText(text);
-    if (type === 'wallet') {
-      setState((prev) => ({ ...prev, copiedWallet: true }));
-      setTimeout(() => setState((prev) => ({ ...prev, copiedWallet: false })), 2000);
-    } else {
-      setState((prev) => ({ ...prev, copiedDID: true }));
-      setTimeout(() => setState((prev) => ({ ...prev, copiedDID: false })), 2000);
+  const copyToClipboard = useCallback(async (text: string, type: 'wallet' | 'did') => {
+    try {
+      await navigator.clipboard.writeText(text);
+      if (type === 'wallet') {
+        setState((prev) => ({ ...prev, copiedWallet: true }));
+        setTimeout(() => setState((prev) => ({ ...prev, copiedWallet: false })), 2000);
+      } else {
+        setState((prev) => ({ ...prev, copiedDID: true }));
+        setTimeout(() => setState((prev) => ({ ...prev, copiedDID: false })), 2000);
+      }
+    } catch (e) {
+      console.warn('Clipboard copy failed', e);
+      toast.error('Could not copy');
     }
   }, []);
 
