@@ -9,10 +9,14 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { useCredentialForm } from '../hooks/use-credential-form';
+import { isDidPkhStellarTestnet } from '@/lib/validation';
 
 export function CredentialForm() {
   const { state, updateField, handleCreate, fillExample, walletAddress, ownerDid } =
     useCredentialForm();
+
+  const subjectDidInvalid =
+    state.subjectDid.length > 0 && !isDidPkhStellarTestnet(state.subjectDid);
 
   return !walletAddress ? (
     <div className="rounded border p-6 md:p-8 min-h-[20vh] flex flex-col items-center justify-center text-center">
@@ -102,7 +106,13 @@ export function CredentialForm() {
             value={state.subjectDid}
             onChange={(e) => updateField('subjectDid', e.target.value)}
             placeholder="did:pkh:stellar:testnet:GAGPI5M5M4CZHQPZSTXOWX4J6UQMUJWFKACPXDRQMZTK43GPOSPW6NVU"
+            aria-invalid={subjectDidInvalid}
           />
+          {subjectDidInvalid && (
+            <p className="text-xs text-red-500 mt-1">
+              Invalid DID format. Expected did:pkh:stellar:testnet:&lt;56-char address&gt;.
+            </p>
+          )}
           <Dialog
             open={state.openSubjectDidInfo}
             onOpenChange={(open) => updateField('openSubjectDidInfo', open)}
